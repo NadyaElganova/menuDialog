@@ -1,10 +1,12 @@
 package com.example.menudialog;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -16,26 +18,35 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.menudialog.recycler.Item;
+import com.example.menudialog.recycler.ListAdapter;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
 import java.util.Calendar;
-
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private Button button;
     private Button btnDatePicker, btnTimePicker;
+    private BottomNavigationView bottomNavigationView;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
         button = findViewById(R.id.dialog);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder builder=new AlertDialog.Builder(view.getContext());
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                 builder.setTitle("Dialog")
                         .setMessage("Action")
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -50,9 +61,8 @@ public class MainActivity extends AppCompatActivity {
                                 finish();
                             }
                         })
-                .create()
-                .show();
-
+                        .create()
+                        .show();
             }
         });
 
@@ -90,5 +100,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        bottomNavigationView = findViewById(R.id.bottom_nav_view);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            Fragment selectedFragment = null;
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.navigation_list) {
+                selectedFragment = new ListFragment();
+            } else if (itemId == R.id.navigation_profile) {
+                selectedFragment = new ProfileFragment();
+            }
+
+            if (selectedFragment != null) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment, selectedFragment).commit();
+            }
+            return true;
+        });
+        bottomNavigationView.setSelectedItemId(R.id.navigation_profile);
     }
 }
